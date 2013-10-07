@@ -42,6 +42,11 @@ Factory.prototype = {
     return this.construct ? new this.construct(result) : result;
   },
 
+  buildCollection: function(attrs) {
+    var result = this.attributes(attrs).models;
+    return this.construct ? new this.construct(result) : result;
+  },
+
   extend: function(name) {
     var factory = Factory.factories[name];
     // Copy the parent's constructor
@@ -69,6 +74,14 @@ Factory.define = function(name, constructor) {
 
 Factory.build = function(name, attrs, options) {
   var obj = this.factories[name].build(attrs);
+  for(var i = 0; i < this.factories[name].callbacks.length; i++) {
+      this.factories[name].callbacks[i](obj, options);
+  }
+  return obj;
+};
+
+Factory.buildCollection = function(name, attrs, options) {
+  var obj = this.factories[name].buildCollection(attrs);
   for(var i = 0; i < this.factories[name].callbacks.length; i++) {
       this.factories[name].callbacks[i](obj, options);
   }
